@@ -1,4 +1,5 @@
 ##Rudy Garcia
+
 import math, m
 
 MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n g - go! \n q - quit"
