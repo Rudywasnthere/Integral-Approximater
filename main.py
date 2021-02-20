@@ -2,7 +2,7 @@
 
 import math, m
 
-MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n g - go! \n q - quit"
+MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n g - go! \n ? - how does this work?\n q - quit"
 
 menu_options = "ncmrg?q"
 
@@ -21,6 +21,7 @@ def new_function():
   play = False
   while play == False:
     user_function = input("Function: ")
+    user_function = replacer(user_function)
     f = lambda x: eval(user_function)
     try:
       useless_garbage = f(0)
@@ -126,7 +127,6 @@ def approximater(user_function, step, low_limit, upper_limit):
 def main():
   print("Hello, I approximate integrals for you")
   user_function = new_function()
-  user_function = replacer(user_function)
   step = change_step()
   lower_limit, upper_limit = change_limits()
   user_input = ""
@@ -147,7 +147,6 @@ def main():
 
     if user_input == "r":
       user_function = new_function()
-      user_function = replacer(user_function)
       step = change_step()
       lower_limit, upper_limit = change_limits()
 
@@ -156,7 +155,7 @@ def main():
       print(f"Your approximation: {approximation}")
 
     if user_input == "?":
-      print("This uses a type of area approximation called Simpson's Rule,\n which is a sum of parabolas formed between the points we're approximating from...")
+      print("This uses a type of area approximation called Simpson's Rule,\nwhich is a sum of parabolas formed between the points we're approximating from...")
 
   print("Thank you for using me :), I hope I helped from tedious calculation")
 
