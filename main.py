@@ -4,7 +4,7 @@ import math, m
 
 MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n g - go! \n q - quit"
 
-menu_options = "ncmrgq"
+menu_options = "ncmrg?q"
 
 def correct_choice():
   play = False
@@ -21,8 +21,9 @@ def new_function():
   play = False
   while play == False:
     user_function = input("Function: ")
+    f = lambda x: eval(user_function)
     try:
-      f = lambda x: eval(input())
+      useless_garbage = f(0)
       play = True
     except:
       if tries//2 == 0:
@@ -56,6 +57,9 @@ def change_limits():
       if low_lim == "e":
         low_lim = math.e
         play = True
+      if low_lim == "pi":
+        low_lim = math.pi
+        play = True
       else:
         print("I need a number please")
         play = False
@@ -69,10 +73,31 @@ def change_limits():
       if upper_lim == "e":
         upper_lim = math.e
         play = True
+      if upper_lim == "pi":
+        upper_lim = math.pi
+        play = True
       else:
         print("I need a number please")
         play = False
   return low_lim, upper_lim
+
+def replacer(user_function):
+  if ".cos(" not in user_function:
+    user_function = user_function.replace("cos(", "math.cos(")
+  if ".sin(" not in user_function:
+    user_function = user_function.replace("sin(", "math.sin(")
+  if ".tan(" not in user_function:
+    user_function = user_function.replace("tan(", "math.tan(")
+  if ".acos(" not in user_function:
+    user_function = user_function.replace("arccos(", "math.acos(")
+    user_function = user_function.replace("cos^-1(", "math.acos(")
+  if ".asin(" not in user_function:
+    user_function = user_function.replace("arcsin(", "math.asin(")
+    user_function = user_function.replace("sin^-1(", "math.asin(")
+  if ".atan(" not in user_function:
+    user_function = user_function.replace("arctan(", "math.atan(")
+    user_function = user_function.replace("tan^-1(", "math.atan(")
+  return user_function
 
 def approximater(user_function, step, low_limit, upper_limit):
   f = lambda x: eval(user_function)
@@ -93,7 +118,7 @@ def approximater(user_function, step, low_limit, upper_limit):
     count += 1
   total *= rise
   total /= 3
-  total = total.__round__(10)
+  total = total.__round__(11)
   return total
 
 
@@ -101,15 +126,19 @@ def approximater(user_function, step, low_limit, upper_limit):
 def main():
   print("Hello, I approximate integrals for you")
   user_function = new_function()
+  user_function = replacer(user_function)
   step = change_step()
   lower_limit, upper_limit = change_limits()
   user_input = ""
+  print(MENU)
   while user_input != "q":
-    print(MENU)
+    if user_input == "g":
+      print(MENU)
     user_input = correct_choice()
     if user_input == "n":
       user_function = new_function()
-    
+      user_function = replacer(user_function)
+
     if user_input == "c":
       step = change_step()
     
@@ -118,13 +147,17 @@ def main():
 
     if user_input == "r":
       user_function = new_function()
+      user_function = replacer(user_function)
       step = change_step()
       lower_limit, upper_limit = change_limits()
 
     if user_input == "g":
       approximation = approximater(user_function, step , lower_limit, upper_limit)
       print(f"Your approximation: {approximation}")
-  print("Thank you for using me :), I hope I helped from tedious calculation")
 
+    if user_input == "?":
+      print("This uses a type of area approximation called Simpson's Rule,\n which is a sum of parabolas formed between the points we're approximating from...")
+
+  print("Thank you for using me :), I hope I helped from tedious calculation")
 
 main()
