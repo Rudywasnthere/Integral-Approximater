@@ -1,0 +1,20 @@
+[[package]]
+category = "main"
+description = "minimalistic media manager"
+name = "mmm"
+optional = false
+python-versions = ">=3.5"
+version = "0.4.2"
+
+[package.extras]
+test = ["coverage"]
+
+[metadata]
+content-hash = "3d79aec564fd1bdd35086a8c54cffb8a4ef1a382915fc663d561a05247e6d66c"
+python-versions = "^3.8"
+
+[metadata.files]
+mmm = [
+    {file = "mmm-0.4.2-py3-none-any.whl", hash = "sha256:670fb7f33356a0f9651b22a4c46e6e69b584c85da731069228fbc19317d5d815"},
+    {file = "mmm-0.4.2.tar.gz", hash = "sha256:c65ede6e78c8aa056c24ff01009c6ff7e984481c5dfcc9e87f28c06fbf448499"},
+]
