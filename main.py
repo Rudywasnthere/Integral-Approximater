@@ -1,6 +1,10 @@
 ##Rudy Garcia
 
 import math as math
+import random as rd
+import matplotlib.pyplot as plt 
+import matplotlib.image as mpimg
+import os
 
 MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n t - type of approximation (best of all by default) \n g - go! \n ? - how does this work?\n q - quit"
 
@@ -34,10 +38,25 @@ def new_function():
     user_function = input("Function: ")
     user_function = replacer(user_function)
     f = lambda x: eval(user_function)
+    random_1 = rd.randint(0,100)
+    random_2 = rd.randint(0,100)
+    random_3 = rd.randint(0,100)
     try:
-      useless_garbage = f(0)
+      useless_garbage = f(random_1)
       play = True
-    except:
+    except ZeroDivisionError:
+      print(f"break at: {random_1}")
+      try:
+        useless_again = f(random_2)
+        play = True
+      except ZeroDivisionError:
+        play = True
+        print(f"break two at: {random_2}")
+        try:
+          useless_finally = f(random_3)
+        except ZeroDivisionError:
+          print(f"break three at: {random_3}")
+    except SyntaxError:
       if tries//2 == 0:
         print("I need correct syntax")
       play = False
@@ -148,7 +167,10 @@ def right_pnt(step, user_function, low_limit, upper_limit):
   f = lambda x: eval(user_function)
   rise = (upper_limit - low_limit)/ step
   while (count <= step):
-    total += f(low_limit + count*rise)
+    try:
+      total += f(low_limit + count*rise)
+    except ZeroDivisionError:
+      useless = 1
     count += 1
   total *= rise
   return total
@@ -159,7 +181,10 @@ def left_pnt(step, user_function, low_limit, upper_limit):
   f = lambda x: eval(user_function)
   rise = (upper_limit - low_limit)/ step
   while ( count < step):
-    total += f(low_limit + count*rise)
+    try:
+      total += f(low_limit + count*rise)
+    except ZeroDivisionError:
+      useless = 1
     count += 1
   total *= rise
   return total
@@ -173,7 +198,10 @@ def midpoint(step, user_function, low_limit, upper_limit):
   low_limit += rise_2
   while ( count < step):
     step_val = low_limit + count*rise
-    total += f(step_val)
+    try:
+      total += f(step_val)
+    except ZeroDivisionError:
+      useless = 1
     count += 1
   total *= rise
   return total
@@ -184,36 +212,48 @@ def trapezoid(step, user_function, low_limit, upper_limit):
     others = 2
     f = lambda x: eval(user_function)
     rise = (upper_limit - low_limit)/ step
-    while ( count <= step):
-      step_val = low_limit + count*rise
-      if count != 0 and count != step:
-       total += 2* f(step_val)
-      else:
-        total += f(step_val)
-      count += 1
-    total *= rise
-    total /= 2
+    try:
+      while ( count <= step):
+        step_val = low_limit + count*rise
+        try:
+          if count != 0 and count != step:
+            total += 2* f(step_val)
+          else:
+            total += f(step_val)
+        except ZeroDivisionError:
+          useless = 1
+        count += 1
+        total *= rise
+        total /= 2
+    except TypeError:
+      print("Trapezoidal method not working...")
     return total
 
 def parabolic(step, user_function, low_limit, upper_limit):
-  f = lambda x: eval(user_function)
   odd, even, rest = 4,2,1
   total = 0
   count = 0
   step_values = ""
-  rise = (upper_limit - low_limit)/step
-  while ( count <= step):
-    step_value = low_limit + count *rise
-    step_values += f"{step_value}  "
-    if ( count == 0 or count == step):
-      total += rest * f(step_value)
-    elif ( count%2 == 1):
-      total += odd * f(step_value)
-    elif ( count%2 == 0):
-      total += even * f(step_value)
-    count += 1
-  total *= rise
-  total /= 3
+  try:
+    f = lambda x: eval(user_function)
+    rise = (upper_limit - low_limit)/step
+    while ( count <= step):
+      step_value = low_limit + count *rise
+      step_values += f"{step_value}  "
+      try:
+        if ( count == 0 or count == step):
+          total += rest * f(step_value)
+        elif ( count%2 == 1):
+          total += odd * f(step_value)
+        elif ( count%2 == 0):
+          total += even * f(step_value)
+      except ZeroDivisionError:
+        useless = 1
+      count += 1
+    total *= rise
+    total /= 3
+  except TypeError:
+    print("Parabolic method not working...")
   return total
 
 def best(total_vals, step, user_function, low_limit, upper_limit):
@@ -226,6 +266,8 @@ def best(total_vals, step, user_function, low_limit, upper_limit):
     best = min(total_vals)
   if test < 0:
     best = max(total_vals)
+  elif test == 0:
+    best = test_1
   position = total_vals.index(best)
   best_type = position_bests[position]
   return best, best_type
@@ -270,8 +312,44 @@ def main():
         print(f"The best approximation type was: {best_type}")
 
     if user_input == "?":
-      print("This uses a type of area approximation called Simpson's Rule,\nwhich is a sum of parabolas formed between the points we're approximating from...")
-
+      filename = ""
+      if aprox_type == "r":
+        print("Right endpoint approximation simply finds\nthe sum of areas of rectangles who heights\nare the right edge of the rectangle")
+        filename = "all points approximation.png"
+      if aprox_type == "l":
+        print("Left endpoint approximation simply finds\nthe sum of areas of rectangles who heights\nare the left edge of the rectangle")
+        filename = "all points approximation.png"
+      if aprox_type == "m":
+        print("Midpoint approximation simply finds\nthe sum of areas of rectangles who heights are is\n a vertical line splitting the rectangle in half")
+        filename = "all points approximation.png"
+      if aprox_type == "t":
+        print("This basically connects the points together into a series\nof trapezoids, and adds those trapezoids together")
+        filename = "trapezoid sum.png"
+      if aprox_type == "p":
+        print("This uses a type of area approximation called\nSimpson's Rule,which is a sum of parabolas formed between\nthe points we're approximating from...")
+        filename = "simpson sum.jpg"
+      if aprox_type == "a":
+        print("This finds the a\verage for all of these 5 types of approximations demonstrated here ")
+      if aprox_type == "b":
+        print("This finds the approximation closest to the real value\nof the integral.It finds the direction of the approximation\nby comparinga lower approximation with a more accurate one\nto find if the approximation is goingupwards or downwards.\nFrom there it either finds the max or min\nof the trapezoidal and parabolic rule,\nbecause these two are the most satistically accurate")
+      try:
+        print('getcwd:      ', os.getcwd())
+        print('__file__:    ', __file__)
+        file_path = str(__file__)
+        f_n_length = len(file_path) - 7
+        file_name = file_path[0:f_n_length] + f"{filename}"
+        print(file_name)
+      except:
+        pass
+      try:
+        img = mpimg.imread(f'{file_name}')
+        imgplot = plt.imshow(img)
+        plt.show()
+      except AttributeError:
+        pass
+      except IOError:
+        print("IOError...")
+        pass
   print("Thank you for using me :), I hope I helped from tedious calculation")
 
 main()
