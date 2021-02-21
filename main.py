@@ -1,10 +1,11 @@
 ##Rudy Garcia
 
-import math, m
+import math as math
 
-MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n g - go! \n ? - how does this work?\n q - quit"
+MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n t - type of approximation (best of all by default) \n g - go! \n ? - how does this work?\n q - quit"
 
-menu_options = "ncmrg?q"
+menu_options = "ncmrtg?q"
+aprox_types = "rlmtpab"
 
 def correct_choice():
   play = False
@@ -15,6 +16,16 @@ def correct_choice():
     else:
       play = False
   return choice
+
+def correct_approx():
+  play = False
+  while play == False:
+    aprox = input("   approx type: ").lower()
+    if aprox in aprox_types:
+      play = True
+    else:
+      play = False
+  return aprox
 
 def new_function():
   tries = 0
@@ -100,7 +111,91 @@ def replacer(user_function):
     user_function = user_function.replace("tan^-1(", "math.atan(")
   return user_function
 
-def approximater(user_function, step, low_limit, upper_limit):
+def approximater(user_function, step, low_limit, upper_limit, aprox_type):
+  best_type = ""
+  string = f"\nYour "
+  if aprox_type == "r":
+    total = right_pnt(step, user_function, low_limit, upper_limit)
+    string += "right endpoint approxiamtion"
+  if aprox_type == "l":
+    total = left_pnt(step, user_function, low_limit, upper_limit)
+    string += "left endpoint approximation"
+  if aprox_type == "m":
+    total = midpoint(step, user_function, low_limit, upper_limit)
+    string += "midpoint approximation"
+  if aprox_type == "t":
+    total = trapezoid(step, user_function, low_limit, upper_limit)
+    string += "trapezoidal approximation"
+  if aprox_type == "p":
+    total = parabolic(step, user_function, low_limit, upper_limit)
+    string += "parabolic approximation"
+  if aprox_type == "a":
+    total = right_pnt(step, user_function, low_limit, upper_limit) + left_pnt(step, user_function, low_limit, upper_limit) + midpoint(step, user_function, low_limit, upper_limit) + trapezoid(step, user_function, low_limit, upper_limit) + parabolic(step, user_function, low_limit, upper_limit)
+    total /= 5
+    string += "average approximation"
+  if aprox_type == "b":
+    total_vals = []
+    total_vals.append(trapezoid(step, user_function, low_limit, upper_limit))
+    total_vals.append(parabolic(step, user_function, low_limit, upper_limit))
+    total, best_type = best(total_vals, step, user_function, low_limit, upper_limit)
+    string += f" best approximation for {step} steps"
+  total = total.__round__(11)
+  return total, string, best_type
+
+def right_pnt(step, user_function, low_limit, upper_limit):
+  total = 0
+  count = 1
+  f = lambda x: eval(user_function)
+  rise = (upper_limit - low_limit)/ step
+  while (count <= step):
+    total += f(low_limit + count*rise)
+    count += 1
+  total *= rise
+  return total
+
+def left_pnt(step, user_function, low_limit, upper_limit):
+  total = 0
+  count = 0
+  f = lambda x: eval(user_function)
+  rise = (upper_limit - low_limit)/ step
+  while ( count < step):
+    total += f(low_limit + count*rise)
+    count += 1
+  total *= rise
+  return total
+
+def midpoint(step, user_function, low_limit, upper_limit):
+  total = 0
+  count = 0
+  f = lambda x: eval(user_function)
+  rise = (upper_limit - low_limit)/ step
+  rise_2 = rise/2
+  low_limit += rise_2
+  while ( count < step):
+    step_val = low_limit + count*rise
+    total += f(step_val)
+    count += 1
+  total *= rise
+  return total
+
+def trapezoid(step, user_function, low_limit, upper_limit):
+    total = 0
+    count = 0
+    others = 2
+    f = lambda x: eval(user_function)
+    rise = (upper_limit - low_limit)/ step
+    while ( count <= step):
+      step_val = low_limit + count*rise
+      if count != 0 and count != step:
+       total += 2* f(step_val)
+      else:
+        total += f(step_val)
+      count += 1
+    total *= rise
+    total /= 2
+    return total
+
+def parabolic(step, user_function, low_limit, upper_limit):
   f = lambda x: eval(user_function)
   odd, even, rest = 4,2,1
   total = 0
@@ -119,10 +214,21 @@ def approximater(user_function, step, low_limit, upper_limit):
     count += 1
   total *= rise
   total /= 3
-  total = total.__round__(11)
   return total
 
-
+def best(total_vals, step, user_function, low_limit, upper_limit):
+  position_bests = ["trapezoidal", "parabolic"]
+  step = step
+  test_1 = parabolic(100, user_function, low_limit, upper_limit)
+  test_2 = parabolic(1000, user_function, low_limit, upper_limit)
+  test = test_1 - test_2
+  if test > 0:
+    best = min(total_vals)
+  if test < 0:
+    best = max(total_vals)
+  position = total_vals.index(best)
+  best_type = position_bests[position]
+  return best, best_type
 
 def main():
   print("Hello, I approximate integrals for you")
@@ -130,9 +236,11 @@ def main():
   step = change_step()
   lower_limit, upper_limit = change_limits()
   user_input = ""
+  aprox_type = "b"
   print(MENU)
   while user_input != "q":
     if user_input == "g":
+      useless_2 = input()
       print(MENU)
     user_input = correct_choice()
     if user_input == "n":
@@ -150,9 +258,16 @@ def main():
       step = change_step()
       lower_limit, upper_limit = change_limits()
 
+    if user_input == "t":
+      print("\n--- r - right endpoint\n    l - left endpoint\n    m - midpoint\n    t - trapezoidal\n    p - parabolic\n    a - average of all types\n    b - best of all types")
+      aprox_type = correct_approx()
+
     if user_input == "g":
-      approximation = approximater(user_function, step , lower_limit, upper_limit)
-      print(f"Your approximation: {approximation}")
+      best_type = ""
+      approximation, string, best_type = approximater(user_function, step , lower_limit, upper_limit, aprox_type)
+      print(f"{string}: {approximation}")
+      if best_type != "":
+        print(f"The best approximation type was: {best_type}")
 
     if user_input == "?":
       print("This uses a type of area approximation called Simpson's Rule,\nwhich is a sum of parabolas formed between the points we're approximating from...")
