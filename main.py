@@ -128,6 +128,14 @@ def replacer(user_function):
   if ".atan(" not in user_function:
     user_function = user_function.replace("arctan(", "math.atan(")
     user_function = user_function.replace("tan^-1(", "math.atan(")
+  if ".log(" not in user_function:
+    user_function = user_function.replace("log(", "math.log10(")
+  if ".ln(" not in user_function:
+    user_function = user_function.replace("ln(", "math.log(")
+  if ".sqrt(" not in user_function:
+    user_function = user_function.replace("sqrt(", "math.sqrt(")
+  if ".exp(" not in user_function:
+    user_function = user_function.replace("e**x" , "math.exp(x)")
   return user_function
 
 def approximater(user_function, step, low_limit, upper_limit, aprox_type):
@@ -209,7 +217,6 @@ def midpoint(step, user_function, low_limit, upper_limit):
 def trapezoid(step, user_function, low_limit, upper_limit):
     total = 0
     count = 0
-    others = 2
     f = lambda x: eval(user_function)
     rise = (upper_limit - low_limit)/ step
     try:
@@ -221,10 +228,11 @@ def trapezoid(step, user_function, low_limit, upper_limit):
           else:
             total += f(step_val)
         except ZeroDivisionError:
+          print("divide by zero error")
           useless = 1
         count += 1
-        total *= rise
-        total /= 2
+      total *= rise
+      total /= 2
     except TypeError:
       print("Trapezoidal method not working...")
     return total
@@ -315,30 +323,28 @@ def main():
       filename = ""
       if aprox_type == "r":
         print("Right endpoint approximation simply finds\nthe sum of areas of rectangles who heights\nare the right edge of the rectangle")
-        filename = "all points approximation.png"
+        filename = "all-points-approximation.png"
       if aprox_type == "l":
         print("Left endpoint approximation simply finds\nthe sum of areas of rectangles who heights\nare the left edge of the rectangle")
-        filename = "all points approximation.png"
+        filename = "all-points-approximation.png"
       if aprox_type == "m":
         print("Midpoint approximation simply finds\nthe sum of areas of rectangles who heights are is\n a vertical line splitting the rectangle in half")
-        filename = "all points approximation.png"
+        filename = "all-points-approximation.png"
       if aprox_type == "t":
         print("This basically connects the points together into a series\nof trapezoids, and adds those trapezoids together")
-        filename = "trapezoid sum.png"
+        filename = "trapezoid-sum.png"
       if aprox_type == "p":
         print("This uses a type of area approximation called\nSimpson's Rule,which is a sum of parabolas formed between\nthe points we're approximating from...")
-        filename = "simpson sum.jpg"
+        filename = "simpson-sum.jpg"
       if aprox_type == "a":
         print("This finds the a\verage for all of these 5 types of approximations demonstrated here ")
       if aprox_type == "b":
         print("This finds the approximation closest to the real value\nof the integral.It finds the direction of the approximation\nby comparinga lower approximation with a more accurate one\nto find if the approximation is goingupwards or downwards.\nFrom there it either finds the max or min\nof the trapezoidal and parabolic rule,\nbecause these two are the most satistically accurate")
       try:
-        print('getcwd:      ', os.getcwd())
-        print('__file__:    ', __file__)
         file_path = str(__file__)
         f_n_length = len(file_path) - 7
         file_name = file_path[0:f_n_length] + f"{filename}"
-        print(file_name)
+        print("close image to continue")
       except:
         pass
       try:
