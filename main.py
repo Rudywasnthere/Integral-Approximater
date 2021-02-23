@@ -309,6 +309,8 @@ def main():
 
     if user_input == "a":
       exact = input("exact answer: ")
+      exact = exact.replace("pi", "math.pi")
+      exact = exact.replace("e", "math.e")
       compare_answer = eval(exact)
       compare = abs(compare_answer - approximation)
       if compare < 0.0001:
