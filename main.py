@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import os
 
-MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n t - type of approximation (best of all by default) \n g - go! \n ? - how does this work?\n q - quit"
+MENU = "\n\t\t--MENU--\t\t\n n - new function \n c - change step \n m - mess with limits \n r - reset all \n t - type of approximation (best of all by default) \n a - compare exact answer \n g - go! \n ? - how does this work?\n q - quit"
 
-menu_options = "ncmrtg?q"
+menu_options = "ncmrtag?q"
 aprox_types = "rlmtpab"
 
 def correct_choice():
@@ -60,6 +60,8 @@ def new_function():
       if tries//2 == 0:
         print("I need correct syntax")
       play = False
+    except NameError:
+      print("NameError")
   return user_function
 
 def change_step():
@@ -81,35 +83,27 @@ def change_limits():
   play = False
   while play == False:
     low_lim = input("lower limit: ")
+    low_lim = low_lim.replace("pi", "math.pi")
+    low_lim = low_lim.replace("e", "math.e")
+    low_lim = eval(low_lim)
     try: 
       low_lim = float(low_lim)
       play = True
     except ValueError:
-      if low_lim == "e":
-        low_lim = math.e
-        play = True
-      if low_lim == "pi":
-        low_lim = math.pi
-        play = True
-      else:
-        print("I need a number please")
-        play = False
+      print("I need a number please")
+      play = False
   play = False
   while play == False:
-    upper_lim = input("upper limit: ") 
+    upper_lim = input("upper limit: ")
+    upper_lim = upper_lim.replace("pi", "math.pi")
+    upper_lim = upper_lim.replace("e", "math.e")
+    upper_lim = eval(upper_lim)
     try: 
       upper_lim = float(upper_lim)
       play = True
     except ValueError:
-      if upper_lim == "e":
-        upper_lim = math.e
-        play = True
-      if upper_lim == "pi":
-        upper_lim = math.pi
-        play = True
-      else:
-        print("I need a number please")
-        play = False
+      print("I need a number please")
+      play = False
   return low_lim, upper_lim
 
 def replacer(user_function):
@@ -281,6 +275,7 @@ def best(total_vals, step, user_function, low_limit, upper_limit):
   return best, best_type
 
 def main():
+  approximation = 0
   print("Hello, I approximate integrals for you")
   user_function = new_function()
   step = change_step()
@@ -312,6 +307,14 @@ def main():
       print("\n--- r - right endpoint\n    l - left endpoint\n    m - midpoint\n    t - trapezoidal\n    p - parabolic\n    a - average of all types\n    b - best of all types")
       aprox_type = correct_approx()
 
+    if user_input == "a":
+      exact = input("exact answer: ")
+      compare_answer = eval(exact)
+      compare = abs(compare_answer - approximation)
+      if compare < 0.0001:
+        print(f"This is probably the exact answer (difference of : {compare} )")
+      else: 
+        print("Either you didn't use enough steps ( I recommend over 5000 on best)\nor your exact answer isn't it")
     if user_input == "g":
       best_type = ""
       approximation, string, best_type = approximater(user_function, step , lower_limit, upper_limit, aprox_type)
