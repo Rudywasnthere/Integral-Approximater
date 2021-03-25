@@ -25,7 +25,7 @@ def correct_approx():
   play = False
   while play == False:
     aprox = input("   approx type: ").lower()
-    if aprox in aprox_types:
+    if aprox in aprox_types and aprox != "":
       play = True
     else:
       play = False
@@ -129,7 +129,11 @@ def replacer(user_function):
   if ".sqrt(" not in user_function:
     user_function = user_function.replace("sqrt(", "math.sqrt(")
   if ".exp(" not in user_function:
-    user_function = user_function.replace("e**x" , "math.exp(x)")
+    user_function = user_function.replace("e**(" , "math.exp(")
+  if ".pi" not in user_function:
+    user_function = user_function.replace("pi", "math.pi")
+  if ".e" not in user_function:
+    user_function = user_function.replace("e", "math.e")
   return user_function
 
 def approximater(user_function, step, low_limit, upper_limit, aprox_type):
@@ -160,7 +164,11 @@ def approximater(user_function, step, low_limit, upper_limit, aprox_type):
     total_vals.append(parabolic(step, user_function, low_limit, upper_limit))
     total, best_type = best(total_vals, step, user_function, low_limit, upper_limit)
     string += f" best approximation for {step} steps"
-  total = total.__round__(11)
+  try:
+    total = total.__round__(11)
+  except UnboundLocalError:
+    print("approximation type not chosen")
+    total = 0
   return total, string, best_type
 
 def right_pnt(step, user_function, low_limit, upper_limit):
@@ -270,11 +278,15 @@ def best(total_vals, step, user_function, low_limit, upper_limit):
     best = max(total_vals)
   elif test == 0:
     best = test_1
-  position = total_vals.index(best)
+  if test == 0:
+    position = 0
+  elif test != 0:
+    position = total_vals.index(best)
   best_type = position_bests[position]
   return best, best_type
 
 def main():
+  input_count = 1
   approximation = 0
   print("Hello, I approximate integrals for you")
   user_function = new_function()
@@ -284,9 +296,10 @@ def main():
   aprox_type = "b"
   print(MENU)
   while user_input != "q":
-    if user_input == "g":
+    if user_input == "g" or input_count%6 == 0:
       useless_2 = input()
       print(MENU)
+      input_count = 1
     user_input = correct_choice()
     if user_input == "n":
       user_function = new_function()
@@ -313,10 +326,10 @@ def main():
       exact = exact.replace("e", "math.e")
       compare_answer = eval(exact)
       compare = abs(compare_answer - approximation)
-      if compare < 0.0001:
+      if compare < 0.00001:
         print(f"This is probably the exact answer (difference of : {compare} )")
       else: 
-        print("Either you didn't use enough steps ( I recommend over 5000 on best)\nor your exact answer isn't it")
+        print(f"Either you didn't use enough steps ( I recommend over 5000 on best)\nor your exact answer isn't it, dif of {compare}")
     if user_input == "g":
       best_type = ""
       approximation, string, best_type = approximater(user_function, step , lower_limit, upper_limit, aprox_type)
@@ -361,6 +374,7 @@ def main():
       except IOError:
         print("IOError...")
         pass
+    input_count += 1
   print("Thank you for using me :), I hope I helped from tedious calculation")
 
 main()
