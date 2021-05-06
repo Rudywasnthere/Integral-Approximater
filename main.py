@@ -44,18 +44,17 @@ def new_function():
     try:
       useless_garbage = f(random_1)
       play = True
-    except ZeroDivisionError:
+    except (ZeroDivisionError, OverflowError, ValueError) as e:
       print(f"break at: {random_1}")
       try:
         useless_again = f(random_2)
-        play = True
-      except ZeroDivisionError:
-        play = True
+      except (ZeroDivisionError, OverflowError, ValueError):
         print(f"break two at: {random_2}")
         try:
           useless_finally = f(random_3)
-        except ZeroDivisionError:
+        except (ZeroDivisionError, OverflowError, ValueError):
           print(f"break three at: {random_3}")
+      play = True
     except SyntaxError:
       if tries//2 == 0:
         print("I need correct syntax")
@@ -134,6 +133,9 @@ def replacer(user_function):
     user_function = user_function.replace("pi", "math.pi")
   if ".e" not in user_function:
     user_function = user_function.replace("e", "math.e")
+  user_function = user_function.replace("^", "**")
+  while "math.math." in user_function:
+    user_function.replace("math.math.", "math.")
   return user_function
 
 def approximater(user_function, step, low_limit, upper_limit, aprox_type):
